@@ -1,0 +1,50 @@
+
+
+## Az CLI Loops 
+
+
+az group list --query "[].name" --output tsv
+
+$RGName=az group list --query "[].name" --output tsv
+
+for name in $RGName; do
+  echo "Checking resources in group: $name"
+  az resource list --resource-group "$name" --output table
+done
+
+
+
+for name in $groupNames; do
+  count=$(az resource list --resource-group "$name" --query "length([])")
+  echo "$name has $count resources"
+done
+
+
+# Get all resource group names
+$groupNames = az group list --query "[].name" --output tsv
+
+# Loop through each name
+foreach ($name in $groupNames) {
+    Write-Host "Checking resources in group: $name"
+    az resource list --resource-group $name --output table
+}
+
+
+
+foreach ($name in $groupNames) {
+    $count = az resource list --resource-group $name --query "length([])" --output tsv
+    Write-Host "$name has $count resources"
+}
+
+
+$resources = az resource list --resource-group $name | ConvertFrom-Json
+$resources | Select-Object name, type
+
+
+
+# Loop through each name
+foreach ($name in $groupNames) {
+    Write-Host "Deleting resources and resource group: $name"
+    az group delete -g $name -y --verbose
+}
+

@@ -1,0 +1,5 @@
+# PowerShell
+$env:ARM_CLIENT_ID = "212f0531-08ec-487e-a7e3-a8e75a408aed"
+$env:ARM_CLIENT_SECRET = "vqQ8Q~U-Xyi4oTd~OtCLVLbsQ1LzSAoQHa.R2cBI"
+$env:ARM_TENANT_ID = "71aeff7e-5688-46a5-bad7-b0a3d713bba3"
+$env:ARM_SUBSCRIPTION_ID = "9352ae6b-6fbe-4ecc-9e80-10bb531a69e1"

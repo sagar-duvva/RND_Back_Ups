@@ -1,0 +1,28 @@
+### QuickStart Template VM Deploayment
+
+#Create a resource group
+resourcegroup="myResourceGroupCLI"
+location="westus3"
+az group create --name $resourcegroup --location $location
+
+#Create virtual machine
+vmname="myVM"
+username="azureuser"
+az vm create \
+ --resource-group $resourcegroup \
+ --name $vmname \
+ --image Win2022AzureEditionCore \
+ --public-ip-sku Standard \
+ --admin-username $username
+
+#Install web server
+az vm run-command invoke -g $resourcegroup \
+-n $vmname \
+--command-id RunPowerShellScript \
+--scripts "Install-WindowsFeature -name Web-Server -IncludeManagementTools"
+
+#Open port 80 for web traffic
+az vm open-port --port 80 --resource-group $resourcegroup --name $vmname
+
+#Clean up resources
+az group delete --name $resourcegroup

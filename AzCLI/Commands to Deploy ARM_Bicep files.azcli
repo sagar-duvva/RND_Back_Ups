@@ -1,0 +1,24 @@
+# Deploy the Bicep file
+# AzCLI
+az group create --name exampleRG --location eastus
+az deployment group create --resource-group exampleRG --template-file main.bicep --parameters adminUsername=<admin-username>
+
+#PowerShell
+New-AzResourceGroup -Name "RGCI" -Location 'Central India' -Verbose  
+New-AzDeployment -Location centralindia -TemplateFile .\001_1rgDeployment.json -Verbose
+
+
+# Review deployed resources
+
+az resource list --resource-group exampleRG
+
+Get-AzResource -ResourceGroupName testRG | Format-Table
+
+# Clean up resources
+
+az group delete --name exampleRG
+
+Remove-AzResourceGroup -Name "ContosoRG01"
+Get-AzResourceGroup -Name "ContosoRG01" | Remove-AzResourceGroup -Force
+Remove-AzResourceGroup -Name "ContosoRG01" -ForceDeletionType "Microsoft.Compute/virtualMachineScaleSets,Microsoft.Compute/virtualMachines,Microsoft.Databricks/workspaces"
+

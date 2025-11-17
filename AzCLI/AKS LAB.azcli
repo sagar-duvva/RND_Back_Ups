@@ -1,0 +1,74 @@
+###################
+##### AKS LAB #####
+###################
+
+## Connecting to Kubernetes cluster
+az aks get-credentials --resource-group aksdemo --name demoakscluster
+
+## check Currently saved cluster config in use
+kubectl config current-context
+kubectl config get-contexts
+
+## Switch between aks cluster using kubectl config use-context <cluster>
+kubectl config use-context demoakscluster
+
+###################
+###################
+###################
+
+##### PODs
+### Get Worker Nodes Status
+kubectl get nodes               # Get Worker Node Status
+kubectl get nodes -o wide       # Get Worker Node Status with wide option
+kubectl get nodes -A -o wide    # Get All Worker Node Status with wide option
+
+### Create a Pod
+# Template
+kubectl run <desired-pod-name> --image <Container-Image> 
+kubectl run my-first-pod --image stacksimplify/kubenginx:1.0.0     # Replace Pod Name, Container Image
+
+
+### List Pods
+kubectl get pods                # List Pods
+kubectl get po                  # Alias name for pods is po
+kubectl get pods -o wide        # List pods with wide option 
+# which also provide Node information on which Pod is running
+kubectl get pods -A             # List Pods from all namespaces
+kubectl get pods -A -o wide     # List Pods from all namespaces with wide option 
+# which also provide Node information on which Pod is running
+
+### Describe Pod
+# Describe the Pod
+kubectl describe pod <Pod-Name>
+kubectl describe pod my-first-pod       # Describe the Pod
+
+### Delete Pod
+# Delete Pod
+kubectl delete pod <Pod-Name>
+kubectl delete pod my-first-pod         # Delete Pod
+
+
+##################################################################################################################################
+
+#####
+##### Demo - Expose Pod with a Service
+#####
+
+# Step 1 ==> Create  a Pod
+kubectl run my-first-pod --image stacksimplify/kubenginx:1.0.0      # Create  a Pod
+
+# Step 2 ==> Expose Pod as a Service
+kubectl expose pod <Pod-Name>  --type=LoadBalancer --port=80 --name=<Service-Name>
+kubectl expose pod my-first-pod  --type=LoadBalancer --port=80 --name=my-first-service  # Expose Pod as a Service
+
+# Step 3 ==> Get Service Info
+kubectl get service         # Get Service Info
+kubectl get svc             # Get Service Info
+
+# Step 4 ==> Describe Service
+kubectl describe service my-first-service       # Describe Service
+
+# Step 5 ==> Access Application
+http://<External-IP-from-get-service-output>    # Access Application
+
+##################################################################################################################################
