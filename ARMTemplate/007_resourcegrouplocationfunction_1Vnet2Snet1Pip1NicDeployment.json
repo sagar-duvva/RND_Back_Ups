@@ -1,0 +1,75 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "functions": [],
+  "resources": [
+  {
+	"name": "virtualNetwork1",
+	"type": "Microsoft.Network/virtualNetworks",
+	"apiVersion": "2023-04-01",
+	"location": "[resourceGroup().location]",
+	"properties": {
+		"addressSpace": {
+			"addressPrefixes": [
+				"10.0.0.0/16"
+			]
+		},
+		"subnets": [
+		{
+			"name": "subnet1",
+			"properties": {
+				"addressPrefix": "10.0.0.0/24"
+			}
+		},
+		{
+			"name": "subnet2",
+			"properties": {
+				"addressPrefix": "10.0.1.0/24"
+			}
+		}
+		]
+	}
+  },
+  {
+	"name": "publicIp01",
+	"type": "Microsoft.Network/publicIPAddresses",
+	"apiVersion": "2023-11-01",
+	"location": "[resourceGroup().location]",
+	"sku": {
+		"name": "Standard"
+	},
+	"properties": {
+		"publicIPAllocationMethod": "Static"
+	}
+  },
+  {
+	"name": "vm-nic001",
+	"type": "Microsoft.Network/networkInterfaces",
+	"apiVersion": "2023-11-01",
+	"location": "[resourceGroup().location]",
+	"dependsOn": [
+		"[resourceId('Microsoft.Network/virtualNetworks', 'virtualNetwork1')]",
+		"[resourceId('Microsoft.Network/publicIPAddresses', 'publicIp01')]"
+	],
+	"properties": {
+		"ipConfigurations": [
+			{
+				"name": "ipConfig001",
+				"properties": {
+					"privateIPAllocationMethod": "Dynamic",
+					"subnet": {
+						"id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'virtualNetwork1', 'subnet1')]"
+					},
+					"publicIPAddress": {
+						"id": "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIp01')]"
+					}
+				}
+			}
+		]
+	}
+  }
+  ],
+  "outputs": {}
+}

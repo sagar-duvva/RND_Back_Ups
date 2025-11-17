@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "SAName": {
+        "type": "string",
+        "metadata": {
+            "description": "Storage Account Name"
+        },
+        "defaultValue": "[toLower(concat('appstor', uniqueString(resourceGroup().id)))]"
+    }
+  },
+  "variables": {},
+  "functions": [],
+  "resources": [
+    {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-05-01",
+            "name": "[parameters('SAName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "allowBlobPublicAccess": true,
+                "accessTier": "Cool",
+                "publicNetworkAccess": "Enabled",
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "defaultAction": "Deny",
+                    "ipRules": [
+                        {
+                            "value": "27.7.60.65"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('SAName'), '/default')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('SAName'))]"
+            ],
+            "properties": {
+                "deleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                },
+                "containerDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                },
+                "isVersioningEnabled": true
+            }
+        }
+  ],
+  "outputs": {}
+}

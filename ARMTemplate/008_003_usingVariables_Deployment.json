@@ -1,0 +1,86 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {
+	"vnet": "virtualNetwork1",
+	"snet": "subnet00",
+	"pip": "publicIp01",
+	"nic": "vm-nic001"
+  },
+  "functions": [],
+  "resources": [
+  {
+	"name": "[variables('vnet')]",
+	"type": "Microsoft.Network/virtualNetworks",
+	"apiVersion": "2023-04-01",
+	"location": "[resourceGroup().location]",
+	"properties": {
+		"addressSpace": {
+			"addressPrefixes": [
+				"10.0.0.0/16"
+			]
+		},
+		"subnets": [
+		{
+			"name": "[concat(variables('snet'), '0')]",
+			"properties": {
+				"addressPrefix": "10.0.0.0/24"
+			}
+		},
+		{
+			"name": "[concat(variables('snet'), '1')]",
+			"properties": {
+				"addressPrefix": "10.0.1.0/24"
+			}
+		},
+		{
+			"name": "[concat(variables('snet'), '2')]",
+			"properties": {
+				"addressPrefix": "10.0.2.0/24"
+			}
+		}
+		]
+	}
+  },
+  {
+	"name": "[variables('pip')]",
+	"type": "Microsoft.Network/publicIPAddresses",
+	"apiVersion": "2023-11-01",
+	"location": "[resourceGroup().location]",
+	"sku": {
+		"name": "Standard"
+	},
+	"properties": {
+		"publicIPAllocationMethod": "Static"
+	}
+  },
+  {
+	"name": "[variables('nic')]",
+	"type": "Microsoft.Network/networkInterfaces",
+	"apiVersion": "2023-11-01",
+	"location": "[resourceGroup().location]",
+	"dependsOn": [
+		"[resourceId('Microsoft.Network/virtualNetworks', variables('vnet'))]",
+		"[resourceId('Microsoft.Network/publicIPAddresses', variables('pip'))]"
+	],
+	"properties": {
+		"ipConfigurations": [
+			{
+				"name": "ipConfig001",
+				"properties": {
+					"privateIPAllocationMethod": "Dynamic",
+					"subnet": {
+						"id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet'), concat(variables('snet'), '0'))]"
+					},
+					"publicIPAddress": {
+						"id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('pip'))]"
+					}
+				}
+			}
+		]
+	}
+  }
+  ],
+  "outputs": {}
+}

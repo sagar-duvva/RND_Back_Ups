@@ -1,0 +1,109 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+	"location":{
+		"type": "string",
+		"metadata": {
+			"description": "Resource Location"
+		},
+		"allowedValues": [
+			"Central India",
+			"South India",
+		],
+	},
+	"vnet": {
+		"type": "string",
+		"metadata": {
+			"description": "Virtual Network"
+		},
+		"defaultValue": "virtualNetwork1"
+	},
+	"snet": {
+		"type": "string",
+		"metadata": {
+			"description": "Subnet"
+		},
+		"defaultValue": "subnet00"
+	}
+  },
+  "variables": {
+	"pip": "publicIp01",
+	"nic": "vm-nic001"
+  },
+  "functions": [],
+  "resources": [
+  {
+	"name": "[parameters('vnet')]",
+	"type": "Microsoft.Network/virtualNetworks",
+	"apiVersion": "2023-04-01",
+	"location": "[parameters('location')]",
+	"properties": {
+		"addressSpace": {
+			"addressPrefixes": [
+				"10.0.0.0/16"
+			]
+		},
+		"subnets": [
+		{
+			"name": "[concat(parameters('snet'), '0')]",
+			"properties": {
+				"addressPrefix": "10.0.0.0/24"
+			}
+		},
+		{
+			"name": "[concat(parameters('snet'), '1')]",
+			"properties": {
+				"addressPrefix": "10.0.1.0/24"
+			}
+		},
+		{
+			"name": "[concat(parameters('snet'), '2')]",
+			"properties": {
+				"addressPrefix": "10.0.2.0/24"
+			}
+		}
+		]
+	}
+  },
+  {
+	"name": "[variables('pip')]",
+	"type": "Microsoft.Network/publicIPAddresses",
+	"apiVersion": "2023-11-01",
+	"location": "[parameters('location')]",
+	"sku": {
+		"name": "Standard"
+	},
+	"properties": {
+		"publicIPAllocationMethod": "Static"
+	}
+  },
+  {
+	"name": "[variables('nic')]",
+	"type": "Microsoft.Network/networkInterfaces",
+	"apiVersion": "2023-11-01",
+	"location": "[parameters('location')]",
+	"dependsOn": [
+		"[resourceId('Microsoft.Network/virtualNetworks', parameters('vnet'))]",
+		"[resourceId('Microsoft.Network/publicIPAddresses', variables('pip'))]"
+	],
+	"properties": {
+		"ipConfigurations": [
+			{
+				"name": "ipConfig001",
+				"properties": {
+					"privateIPAllocationMethod": "Dynamic",
+					"subnet": {
+						"id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnet'), concat(parameters('snet'), '0'))]"
+					},
+					"publicIPAddress": {
+						"id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('pip'))]"
+					}
+				}
+			}
+		]
+	}
+  }
+  ],
+  "outputs": {}
+}

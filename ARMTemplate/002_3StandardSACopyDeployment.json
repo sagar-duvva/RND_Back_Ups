@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "functions": [],
+  "resources": [
+  {
+	"name": "[concat('appstore30052025000',copyIndex())]",
+	"type": "Microsoft.Storage/storageAccounts",
+	"apiVersion": "2023-04-01",
+	"location": "centralindia",
+	"kind": "StorageV2",
+	"sku": {
+		"name": "Standard_LRS"
+	},
+	"copy": {
+		"name": "storagecopy",
+		"count": 3
+	}
+  }
+  ],
+  "outputs": {}
+}

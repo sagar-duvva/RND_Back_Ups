@@ -1,0 +1,159 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "functions": [],
+  "resources": [
+  {
+	"name": "virtualNetwork1",
+	"type": "Microsoft.Network/virtualNetworks",
+	"apiVersion": "2023-04-01",
+	"location": "centralindia",
+	"properties": {
+		"addressSpace": {
+			"addressPrefixes": [
+				"10.0.0.0/16"
+			]
+		},
+		"subnets": [
+		{
+			"name": "subnet1",
+			"properties": {
+				"addressPrefix": "10.0.0.0/24"
+			}
+		},
+		{
+			"name": "subnet2",
+			"properties": {
+				"addressPrefix": "10.0.1.0/24"
+			}
+		}
+		]
+	}
+  },
+  {
+	"name": "publicIp01",
+	"type": "Microsoft.Network/publicIPAddresses",
+	"apiVersion": "2023-11-01",
+	"location": "centralindia",
+	"sku": {
+		"name": "Standard"
+	},
+	"properties": {
+		"publicIPAllocationMethod": "Static"
+	}
+  },
+  {
+		"name": "nsg01",
+		"type": "Microsoft.Network/networkSecurityGroups",
+		"apiVersion": "2023-11-01",
+		"location": "centralindia",
+		"properties": {
+			"securityRules": [
+				{
+					"name": "RDP_Allow",
+					"properties": {
+						"description": "RDP_Allow",
+						"protocol": "Tcp",
+						"sourcePortRange": "*",
+						"destinationPortRange": "3389",
+						"sourceAddressPrefix": "27.6.79.135",
+						"destinationAddressPrefix": "*",
+						"access": "Allow",
+						"priority": 100,
+						"direction": "Inbound"
+					}
+				}
+			]
+		}
+	},
+  {
+	"name": "azappvm001nic001",
+	"type": "Microsoft.Network/networkInterfaces",
+	"apiVersion": "2023-11-01",
+	"location": "centralindia",
+	"dependsOn": [
+		"[resourceId('Microsoft.Network/virtualNetworks', 'virtualNetwork1')]",
+		"[resourceId('Microsoft.Network/publicIPAddresses', 'publicIp01')]",
+		"[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg01')]"
+	],
+	"properties": {
+		"ipConfigurations": [
+			{
+				"name": "ipConfig001",
+				"properties": {
+					"privateIPAllocationMethod": "Dynamic",
+					"subnet": {
+						"id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'virtualNetwork1', 'subnet1')]"
+					},
+					"publicIPAddress": {
+						"id": "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIp01')]"
+					}
+				}
+			}
+		],
+		"networkSecurityGroup": {
+			"id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg01')]"
+		}
+	}
+  },
+  {
+	"name": "appstore050620250001",
+	"type": "Microsoft.Storage/storageAccounts",
+	"apiVersion": "2023-01-01",
+	"location": "centralindia",
+	"kind": "StorageV2",
+	"sku": {
+		"name": "Standard_LRS"
+	}
+  },
+  {
+	  "name": "azappvm001",
+	  "type": "Microsoft.Compute/virtualMachines",
+	  "apiVersion": "2024-07-01",
+	  "location": "centralindia",
+	  "dependsOn": [
+		"[resourceId('Microsoft.Storage/storageAccounts', 'appstore050620250001')]",
+		"[resourceId('Microsoft.Network/networkInterfaces', 'azappvm001nic001')]"
+	  ],
+	  "properties": {
+		  "hardwareProfile": {
+			  "vmSize": "Standard_B2s"
+		  },
+		  "osProfile": {
+			  "computerName": "azappvm001",
+			  "adminUsername": "vmadmin",
+			  "adminPassword": "Passw0rd@123"
+		  },
+		  "storageProfile": {
+			  "imageReference": {
+				  "publisher": "MicrosoftWindowsServer",
+				  "offer": "WindowsServer",
+				  "sku": "2022-datacenter",
+				  "version": "20348.3695.250523"
+			  },
+			  "osDisk": {
+				  "name": "azappvm001osdisk",
+				  "caching": "ReadWrite",
+				  "createOption": "FromImage"
+			  }
+		  },
+		  "networkProfile": {
+			  "networkInterfaces": [
+			  {
+				  "id": "[resourceId('Microsoft.Network/networkInterfaces', 'azappvm001nic001')]"
+			  }
+			  ]
+		  },
+		  "diagnosticsProfile": {
+			  "bootDiagnostics": {
+				  "enabled": true,
+				  "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', 'appstore050620250001'), '2023-01-01').primaryEndpoints.blob]"
+			  }
+		  }
+	  }
+  }
+  ],
+  "outputs": {}
+}

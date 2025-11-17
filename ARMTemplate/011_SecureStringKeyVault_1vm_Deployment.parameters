@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+	  "vmpass": {
+		  "reference": {
+			  "keyvault": {
+				  "id": "/subscriptions/9352ae6b-6fbe-4ecc-9e80-10bb531a69e1/resourceGroups/RGCI/providers/Microsoft.KeyVault/vaults/kvci0001"
+			  },
+			  "secretName": "vmpassword"
+		  }
+	  }
+  },
+}

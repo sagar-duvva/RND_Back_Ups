@@ -1,0 +1,69 @@
+# Install Bicep
+az bicep install && az bicep upgrade
+
+# Sign in to Azure
+az login
+
+#Get the Concierge Subscription IDs
+az account list --refresh --query "[?contains(name, 'Concierge Subscription')].id" --output table
+
+#Get the AzSub01 Subscription IDs
+az account list --refresh --query "[?contains(name, 'AzSub01')]" --output table
+az account list --refresh --query "[?contains(name, 'AzSub01')].id" --output table
+
+#Set the default subscription by using the subscription ID
+az account set --subscription {your subscription ID}
+az account set --subscription 71aeff7e-5688-46a5-bad7-b0a3d713bba3
+
+# checking default subscription
+az account show -o table
+
+#Set the default resource group
+#When you use the Azure CLI, you can set the default resource group and omit the parameter from the rest of the Azure CLI commands in this exercise. 
+#Set the default to the resource group that's created for you in the sandbox environment.
+az configure --defaults group="[sandbox resource group name]"
+
+#Deploy the Bicep file to Azure
+az deployment group create --name main --template-file main.bicep
+
+#You can also verify the deployment from the command line
+az deployment group list --output table
+az deployment group list --resource-group testrg --output table #if not default resource group
+
+
+
+##Creating Resource Group
+az group create --resource-group staging-grp --location centralindia
+az group create --name staging-grp --location centralindia
+az group create -g staging-grp -l centralindia
+az group create -n staging-grp -l centralindia --verbose
+
+
+## Listing Resources from ResourceGroup
+az resource list -g staging-grp -o table --verbose
+az resource list -g staging-grp -o tsv --verbose
+
+##CleanUp -- Deleting Resource Group
+az group delete --name staging-grp --verbose
+az group delete --resource-group staging-grp --verbose
+az group delete --resource-group staging-grp --yes --verbose ## Do not prompt for confirmation with use of --yes
+az group delete --name MyResourceGroup --force-deletion-types Microsoft.Compute/virtualMachines
+az group delete -n staging-grp --verbose
+az group delete -g staging-grp --verbose
+az group delete -g staging-grp -y --verbose
+az group delete -n MyResourceGroup -f Microsoft.Compute/virtualMachines
+
+
+##passing parameters while deploying resources
+az deployment group create --resource-group exampleRG --template-file main.bicep --parameters storageAccountName=uniquename
+
+
+## Deploying Bicep Template
+az deployment group create --resource-group staging-grp --name DeploymentName01 --template-file .\Bicep\06_outputSA.bicep  --verbose
+az deployment group create -g staging-grp -n 1saDeploy -f .\01-1SA.bicep  --verbose 
+
+
+
+
+az group export --name "your_resource_group_name" > main.json
+az bicep decompile --file main.json
