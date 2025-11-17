@@ -12,3 +12,13 @@ az deployment sub create --location centralindia --template-file .\script.bicep 
 
 
 az group delete --resource-group $rgn
+
+
+<#
+Informative URLS
+https://learn.microsoft.com/en-us/azure/azure-resource-manager/
+https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install
+https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/bicep-functions
+https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/parameter-files?tabs=Bicep#related-content
+#>>
+
