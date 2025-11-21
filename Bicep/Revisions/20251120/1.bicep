@@ -1,3 +1,5 @@
+// Description :- This template deploys a AppServicePlan and a WebApp based on given prefix
+
 param prefix string = 'dev'
 
 var regions = [
@@ -24,17 +26,19 @@ resource prodAppServicePlan 'Microsoft.Web/serverfarms@2020-12-01' = if (prefix 
   }
 }
 
-var appPlanId = (prefix == 'prod') ? '${prodAppServicePlan.id}' : '${devAppServicePlan.id}'
+
+output appdetail string = (prefix == 'prod') ? prodAppServicePlan.properties.freeOfferExpirationTime : devAppServicePlan.properties.freeOfferExpirationTime
+// var appPlanId = (prefix == 'prod') ? prodAppServicePlan.id : devAppServicePlan.id
 
 resource webApplication 'Microsoft.Web/sites@2021-01-15' = {
   name: 'bicepdemowebapp20251121'
-  location: '${prefix == 'dev'} ? ${last(regions)} : ${first(regions)}'
+  location: (prefix == 'dev') ? last(regions) : first(regions)
   properties: {
-    serverFarmId: appPlanId
-
+    serverFarmId: (prefix == 'prod') ? prodAppServicePlan.id : devAppServicePlan.id
   }
-
 }
 
 
-output locVar string = '${prefix == 'dev'} ? ${last(regions)} : ${first(regions)}'
+output locationOut string = (prefix == 'dev') ? last(regions) : first(regions)
+output appIdOut string = (prefix == 'prod') ? prodAppServicePlan.id : devAppServicePlan.id
+//output locVar1 string = (prefix == 'dev') ? last(regions) : first(regions)
