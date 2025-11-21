@@ -27,11 +27,13 @@ resource prodAppServicePlan 'Microsoft.Web/serverfarms@2020-12-01' = if (prefix 
 var appPlanId = (prefix == 'prod') ? '${prodAppServicePlan.id}' : '${devAppServicePlan.id}'
 
 resource webApplication 'Microsoft.Web/sites@2021-01-15' = {
-  name: 'bicepwebapp'
+  name: 'bicepdemowebapp20251121'
   location: '${prefix == 'dev'} ? ${last(regions)} : ${first(regions)}'
   properties: {
     serverFarmId: appPlanId
+
   }
+
 }
 
 
