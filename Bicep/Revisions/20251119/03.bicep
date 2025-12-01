@@ -2,11 +2,7 @@
 var prefix = 'dev'
 
 // Variable array
-var regions = [
-  'eastus'
-  'northeurope'
-  'centralindia'
-]
+
 
 var regions = [
   {
